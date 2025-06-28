@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import Title from '../components/Title';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { autoTable } from 'jspdf-autotable'
 
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
@@ -56,7 +56,7 @@ const Orders = () => {
     doc.text(`Order Date: ${new Date(item.date).toLocaleDateString()}`, 15, 90);
 
     // Product Details Table
-    doc.autoTable({
+     autoTable(doc,{
       startY: 100,
       head: [['Product Name', 'Quantity', 'Price', 'Total']],
       body: [
@@ -69,6 +69,8 @@ const Orders = () => {
     doc.text(`Grand Total: ${currency}${(item.quantity * item.price).toFixed(2)}`, 15, doc.lastAutoTable.finalY + 15);
 
     doc.save(`Invoice_${item.address.firstName}.pdf`);
+    console.log('autoTable available:', typeof jsPDF().autoTable);
+
   };
 
   useEffect(() => {

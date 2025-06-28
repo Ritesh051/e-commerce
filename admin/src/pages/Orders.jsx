@@ -4,7 +4,7 @@ import { backendUrl, currency } from '../App';
 import { toast } from 'react-toastify';
 import { assets } from '../assets/assets';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { autoTable } from 'jspdf-autotable'
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([]);
@@ -45,7 +45,8 @@ const Orders = ({ token }) => {
   }, [token]);
 
   // Function to generate and download invoice PDF
-  const generateInvoicePDF = (order) => {
+  
+const generateInvoicePDF = (order) => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text('Invoice', 90, 15);
@@ -59,17 +60,18 @@ const Orders = ({ token }) => {
     doc.text(`Payment Status: ${order.payment ? 'Done' : 'Pending'}`, 15, 80);
     doc.text(`Order Date: ${new Date(order.date).toLocaleDateString()}`, 15, 90);
 
-    // Table without Size Column
-    doc.autoTable({
+    // Use autoTable function directly
+autoTable(doc,{
       startY: 100,
       head: [['Item', 'Quantity', 'Price']],
       body: order.items.map((item) => [item.name, item.quantity, `${currency}${item.price}`]),
     });
-    
-    doc.text(`Total Amount: ${currency}${order.amount}`, 15, doc.lastAutoTable.finalY + 10);
+
+    const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 110;
+    doc.text(`Total Amount: ${currency}${order.amount}`, 15, finalY + 10);
 
     doc.save(`Invoice_${order.address.firstName}.pdf`);
-  };
+};
 
   return (
     <div>
